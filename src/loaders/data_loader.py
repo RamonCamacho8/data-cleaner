@@ -16,7 +16,6 @@ class DataLoader(ABC):
         """
         Ahora garantizamos que este método siempre devuelve un DataFrame.
         """
-        print(f"Iniciando carga desde: {path_or_key}")
         raw_content = self._fetch_content(path_or_key)
 
         if not raw_content:
