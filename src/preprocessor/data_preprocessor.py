@@ -145,7 +145,6 @@ class DataPreprocessor:
             Tuple[pd.DataFrame, Dict[str, str]]: A tuple containing
             the cleaned DataFrame and a dictionary mapping original
             column names to cleaned column names.
-
         """
 
         df = dataframe.copy()
@@ -171,8 +170,55 @@ class DataPreprocessor:
 
         return df, mapping
 
-    def add_null_flags(self):
-        pass
+    @staticmethod
+    def add_null_flags(
+        dataframe: pd.DataFrame, target_cols: list[str]
+    ) -> pd.DataFrame:
+        """Search for NaN values in specified columns and if found,
+        creates a new boolean column (column_nan), each row indicates if
+        the original value was null with 1 (True) or 0 (False).
+        Args:
+            dataframe (pd.DataFrame): The input DataFrame.
+            target_cols (list[str]): List of columns to check for NaN values.
+        Returns:
+            pd.DataFrame: The DataFrame with new NaN flag columns added.
+        """
 
-    def analyze_quality(self):
-        pass
+        dataframe = dataframe.copy()
+        for col in target_cols:
+            if col in dataframe.columns:
+                nan_col_name = f"{col}_nan"
+                dataframe[nan_col_name] = dataframe[col].isna().astype(int)
+
+        return dataframe
+
+    @staticmethod
+    def analyze_quality(
+        dataframe: pd.DataFrame, target_col: str, threshold: float = 0.05
+    ) -> None:
+        """
+        Analyzes the quality of the DataFrame by calculating
+        the percentage of NaN values in each column.
+        Prints a report of columns exceeding the specified threshold.
+
+        Args:
+            dataframe (pd.DataFrame): The DataFrame to analyze.
+            treshold (float): The threshold percentage for reporting.
+        """
+
+        total_rows = len(dataframe)
+        print(f"Analisis de calidad basado en la columna \"{target_col}\":")
+        nan_count = dataframe[target_col].isna().sum()
+        nan_percentage = nan_count / total_rows
+
+        print(
+            f"- Columna '{target_col}' tiene {nan_percentage:.2%} valores NaN "
+            f"({nan_count} de {total_rows})"
+            )
+
+        if nan_percentage > threshold:
+            print(
+                f"ALERTA: Esto excede el umbral de {threshold:.2%}!")
+            print("Se recomienda descartar el dataset y solicitar uno nuevo.")
+        else:
+            print("La calidad de los datos es aceptable.")
