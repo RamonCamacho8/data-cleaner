@@ -3,7 +3,7 @@ name: flake8 Lint
 # Controls when the workflow will run
 on:
   push:
-    branches: [ main ]
+    branches: [ main , feature/*]
   pull_request:
     branches: [ main ]
 
